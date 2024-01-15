@@ -1,0 +1,37 @@
+
+version: '3.3'
+
+services:
+        tcc_laravel:
+                depends_on:
+                        - tcc_db           
+                image: php8:latest
+                build:
+                        context: ./container/php8
+                        dockerfile: Dockerfile
+                ports:
+                        - "8088:80"
+                restart: "no"
+                volumes:
+                        - ./container/php8/apache-vhost.conf:/etc/apache2/sites-enabled/000-default.conf
+                        - ./container/php8/php_enable_debug_config.ini:/usr/local/etc/php/conf.d/php_enable_debug_config.ini
+                        - ./container/php8/php_session_timeout.ini:/usr/local/etc/php/conf.d/99-php_session_timeout.ini
+                environment:
+                        SERVER: "tcc_db"
+                        DBUSER: "root"
+                        PASS: "123456"
+                        NAME: "tcc_db"
+                        TABLE: "tcc"
+                        TZ: "America/Sao_Paulo"
+
+        tcc_db:
+                image: mysql:8.0.21
+                volumes:
+                        - ./container/mysql8/:/var/lib/mysql8
+                restart: "always"
+                environment:
+                        MYSQL_USER: root
+                        MYSQL_ROOT_PASSWORD: 123456
+                        TZ: "America/Sao_Paulo"
+                ports:
+                        - "3309:3306"

@@ -1,0 +1,59 @@
+FROM debian:bullseye
+
+RUN apt update; apt upgrade -y
+ENV TZ=America/Sao_Paulo
+RUN ln -sf /usr/share/zoneinfo/America/Sao_Paulo /etc/localtime
+RUN ls /etc/apt/
+RUN apt-get install -y \
+        libfreetype6-dev \
+        libjpeg62-turbo-dev \
+        libmcrypt-dev \
+        libmemcached-dev \
+        zlib1g-dev \
+        libxml2-dev \
+        curl libcurl3-dev \
+		libpq-dev \
+        libsqlite3-dev \
+        libsqlite3-0 \
+        libc-client-dev \
+        libkrb5-dev \
+        zlib1g-dev \
+		libicu-dev \
+		g++ \
+		vim \
+		unzip \
+		git \
+		python \
+		graphviz \
+		ngrep \
+		wget \
+		gnupg \
+		tcpdump \
+		net-tools \
+		apache2 \
+		software-properties-common ca-certificates lsb-release apt-transport-https 
+
+
+RUN a2enmod rewrite headers expires
+RUN apt-key adv --fetch-keys 'https://packages.sury.org/php/apt.gpg' > /dev/null 2>&1; sh -c 'echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/php.list' ; apt update
+RUN apt install -y php5.6 php5.6-cli  php5.6-mysql php5.6-pdo-mysql php5.6-mbstring php5.6-xml php5.6-common php5.6-curl php5.6-gd php5.6-intl php5.6-iconv php5.6-mcrypt php5.6-simplexml php5.6-exif php5.6-mbstring php5.6-soap php5.6-pdo php5.6-mysqli php5.6-calendar php5.6-bcmath php5.6-zip php5.6-opcache php5.6-xdebug php5.6-memcache php5.6-memcached
+
+
+RUN echo "display_errors = On" >> /etc/php/5.6/apache2/conf.d/customs.ini \
+	&& echo "display_startup_errors = On" >> /etc/php/5.6/apache2/conf.d/customs.ini \
+	&& echo "date.timezone = America/Sao_Paulo" >> /etc/php/5.6/apache2/conf.d/customs.ini \
+	&& echo "post_max_size = 100M" >> /etc/php/5.6/apache2/conf.d/customs.ini \
+	&& echo "upload_max_filesize = 100M" >> /etc/php/5.6/apache2/conf.d/customs.ini \
+	&& echo "short_open_tag = On" >> /etc/php/5.6/apache2/conf.d/customs.ini \
+	&& echo "expose_php = On" >> /etc/php/5.6/apache2/conf.d/customs.ini \
+	&& echo 'error_reporting = E_ALL' >> /etc/php/5.6/apache2/conf.d/customs.ini \
+	&& echo 'log_errors = On' >> /etc/php/5.6/apache2/conf.d/customs.ini \
+	&& echo 'always_populate_raw_post_data=-1' >> /etc/php/5.6/apache2/conf.d/customs.ini \
+	&& echo 'memory_limit=512M' >> /etc/php/5.6/apache2/conf.d/customs.ini \
+	&& echo 'error_log=/proc/self/fd/2' >> /etc/php/5.6/apache2/conf.d/customs.ini \
+	&& echo 'xdebug.profiler_enable=1' >> /etc/php/5.6/apache2/conf.d/customs.ini \
+	&& echo 'xdebug.remote_enable=1' >> /etc/php/5.6/apache2/conf.d/customs.ini 
+
+ENTRYPOINT ["/usr/sbin/apache2ctl"]
+CMD ["-D", "FOREGROUND"]
+EXPOSE 80
